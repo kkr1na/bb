@@ -1,0 +1,98 @@
+<!DOCTYPE html>
+<html lang="uk">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Динамічна таблиця з API</title>
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+</head>
+<body>
+
+<h2>Таблиця з даними</h2>
+
+<button id="load-data">Оновити таблицю</button>
+
+<table id="data-table" border="1">
+    <thead>
+        <tr>
+            <th>Ім'я <button id="sort-name">🔽</button></th>
+            <th>Фракція <button id="sort-affiliation">🔽</button></th>
+        </tr>
+    </thead>
+    <tbody>
+        <!-- Дані будуть додаватися сюди -->
+    </tbody>
+</table>
+
+<script>
+// Завантаження даних при завантаженні сторінки
+$(document).ready(function() {
+    // Функція для отримання даних
+    function loadData() {
+        $.ajax({
+            url: 'http://lab.vntu.org/api-server/lab7.php',
+            type: 'GET',
+            dataType: 'json',
+            success: function(data) {
+                console.log(data);  // Перевірка: виводимо дані у консоль
+                if (Array.isArray(data)) {
+                    let tableContent = '';
+                    data.forEach(function(record) {
+                        tableContent += `<tr>
+                                            <td>${record.name}</td>
+                                            <td>${record.affiliation}</td>
+                                          </tr>`;
+                    });
+                    $('#data-table tbody').html(tableContent);  // Вставка даних у таблицю
+                } else {
+                    console.error('Невірний формат даних');
+                }
+            },
+            error: function(xhr, status, error) {
+                console.error('Помилка запиту:', error);
+            }
+        });
+    }
+
+    // Завантаження даних при натисканні кнопки
+    $('#load-data').click(function() {
+        loadData();
+    });
+
+    // Завантаження даних при завантаженні сторінки
+    loadData();
+    
+    // Сортування за іменем
+    $('#sort-name').click(function() {
+        let rows = $('#data-table tbody tr').get();
+        rows.sort(function(a, b) {
+            let nameA = $(a).find('td').eq(0).text().toUpperCase();
+            let nameB = $(b).find('td').eq(0).text().toUpperCase();
+            if (nameA < nameB) return -1;
+            if (nameA > nameB) return 1;
+            return 0;
+        });
+        $.each(rows, function(index, row) {
+            $('#data-table tbody').append(row);
+        });
+    });
+
+    // Сортування за фракцією
+    $('#sort-affiliation').click(function() {
+        let rows = $('#data-table tbody tr').get();
+        rows.sort(function(a, b) {
+            let affiliationA = $(a).find('td').eq(1).text().toUpperCase();
+            let affiliationB = $(b).find('td').eq(1).text().toUpperCase();
+            if (affiliationA < affiliationB) return -1;
+            if (affiliationA > affiliationB) return 1;
+            return 0;
+        });
+        $.each(rows, function(index, row) {
+            $('#data-table tbody').append(row);
+        });
+    });
+});
+</script>
+
+</body>
+</html>

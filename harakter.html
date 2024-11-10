@@ -1,0 +1,94 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Все про знаки зодіаку, сумісність та історія</title>
+    <link rel="stylesheet" type="text/css" href="index.css">
+    <script src="js/core.js" defer></script>
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+</head>
+<button id="back"> Назад </button>
+<body id="characteristics">   
+    <p id="textt" align="center">  <b> Характеристика</b>  </p>
+    <ul class="list"> 
+    <li><a href="kozerig.html"> Козеріг </a> </li>
+    <li>  Водолій</li>
+    <li>  Риби</li>
+    <li>  Овен</li>
+    <li>  Телець</li>
+    <li>  Близнюк</li>
+    <li>  Рак</li>
+    <li>  Лев</li>
+    <li>  Діва</li>
+    <li>  Терези</li>
+    <li>  Скорпіон</li>
+    <li>  Стрілець</li>
+</ul>
+<div class="container">
+    <div class="sidebar">
+    <button id="randomZodiac">Вибрати випадковий знак зодіаку</button>
+    <p id="zodiacName"></p>
+
+    <button id="randomPrinciples">Показати 2 принципи</button>
+    <p id="principlesList"></p>
+    </div>
+</div>
+    <script>
+        let zodiacPrinciples = {};
+        let selectedZodiac = "";
+
+        // Завантаження даних із текстового файлу
+        $(document).ready(function() {
+            $.get("principles.txt", function(data) {
+                const lines = data.split('\n');
+                let currentZodiac = "";
+
+                // Розбір текстового файлу
+                lines.forEach(line => {
+                    line = line.trim();
+                    if (line.startsWith('#')) {
+                        currentZodiac = line.substring(1); // Видаляємо #
+                        zodiacPrinciples[currentZodiac] = [];
+                    } else if (line && currentZodiac) {
+                        zodiacPrinciples[currentZodiac].push(line);
+                    }
+                });
+            });
+
+            // Випадковий вибір знаку зодіаку
+            $("#randomZodiac").click(function() {
+                const zodiacs = Object.keys(zodiacPrinciples);
+                selectedZodiac = zodiacs[Math.floor(Math.random() * zodiacs.length)];
+                $("#zodiacName").text("Знак: " + selectedZodiac);
+                $("#principlesList").empty();
+            });
+
+            // Випадковий вибір 2 принципів для вибраного знаку
+            $("#randomPrinciples").click(function() {
+                if (selectedZodiac) {
+                    const principles = zodiacPrinciples[selectedZodiac];
+                    const randomPrinciples = [];
+                    while (randomPrinciples.length < 2) {
+                        const randomPrinciple = principles[Math.floor(Math.random() * principles.length)];
+                        if (!randomPrinciples.includes(randomPrinciple)) {
+                            randomPrinciples.push(randomPrinciple);
+                        }
+                    }
+
+                    // Очищуємо попередні принципи і додаємо нові
+                    $("#principlesList").empty();
+                    randomPrinciples.forEach(principle => {
+                        $("#principlesList").append("<li>" + principle + "</li>");
+                    });
+                } else {
+                    $("#zodiacName").text("Спершу виберіть знак зодіаку.");
+                }
+            });
+        });
+    </script>
+</body>
+
+</html>
+
